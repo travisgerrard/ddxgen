@@ -69,7 +69,7 @@ const Home = () => {
                 {isGenerating ? (
                   <span className="loader"></span>
                 ) : (
-                  <p>Generate</p>
+                  <p>Generate DDx</p>
                 )}
               </div>
             </a>
