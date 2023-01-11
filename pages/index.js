@@ -1,19 +1,32 @@
 import { useState } from 'react';
 import Head from 'next/head';
-import Image from 'next/image';
-import buildspaceLogo from '../assets/buildspace-logo.png';
+// import Image from 'next/image';
+// import buildspaceLogo from '../assets/buildspace-logo.png';
 
 const Home = () => {
   const [userInput, setUserInput] = useState('');
 
+  // For the DDx Generation
   const [apiOutput, setApiOutput] = useState('');
-  const [isGenerating, setIsGenerating] = useState(false);
+  const [ddxList, setDdxList] = useState('');
+  const [isGeneratingDDx, setIsGeneratingDDx] = useState(false);
 
-  const callGenerateEndpoint = async () => {
-    setIsGenerating(true);
+  // For the Why Generation
+  const [apiWhyOutput, setApiWhyOutput] = useState([
+    null,
+    null,
+    null,
+    null,
+    null,
+  ]);
+  const [whyIndex, setWhyIndex] = useState([]);
+  const [isGeneratingWhy, setIsGeneratingWhy] = useState(false);
+
+  const callGenerateDDxEndpoint = async ({}) => {
+    setIsGeneratingDDx(true);
 
     console.log('Calling OpenAI...');
-    const response = await fetch('/api/generate', {
+    const response = await fetch('/api/generateDDx', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -23,10 +36,41 @@ const Home = () => {
 
     const data = await response.json();
     const { output } = data;
+    console.log('Output', output);
     console.log('OpenAI replied...', output.text);
 
-    setApiOutput(`${output.text}`);
-    setIsGenerating(false);
+    let outPutBrokenUp = output.text.split(/\r?\n/);
+    console.log('Broken up', outPutBrokenUp);
+
+    setDdxList(outPutBrokenUp);
+    setApiOutput(output.text);
+    setIsGeneratingDDx(false);
+  };
+
+  const callGenerateWhyEndpoint = async ({ dx, index }) => {
+    setIsGeneratingWhy(true);
+
+    console.log('Calling OpenAI...');
+    const response = await fetch('/api/generateWhy', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ userInput, apiOutput, dx }),
+    });
+
+    const data = await response.json();
+    console.log('Data', data);
+
+    const { output } = data;
+    console.log('Output', output);
+    console.log('OpenAI replied...', output.text);
+
+    // setDdxList(outPutBrokenUp);
+    var tempArray = apiWhyOutput;
+    tempArray[index] = output.text;
+    setApiWhyOutput(tempArray);
+    setIsGeneratingWhy(false);
   };
 
   const onUserChangedText = (event) => {
@@ -45,10 +89,10 @@ const Home = () => {
             <h1>DDxGen</h1>
           </div>
           <div className="header-subtitle">
-            <h2>Generate differential diagnosis</h2>
+            <h2>Generate differential diagnoses</h2>
           </div>
           <div className="header-subtitle">
-            <h3>Enter the HPI below to get started</h3>
+            <h3>Enter HPI below to get started</h3>
           </div>
         </div>
         <div className="prompt-container">
@@ -61,20 +105,20 @@ const Home = () => {
           <div className="prompt-buttons">
             <a
               className={
-                isGenerating ? 'generate-button loading' : 'generate-button'
+                isGeneratingDDx ? 'generate-button loading' : 'generate-button'
               }
-              onClick={callGenerateEndpoint}
+              onClick={callGenerateDDxEndpoint}
             >
               <div className="generate">
-                {isGenerating ? (
+                {isGeneratingDDx ? (
                   <span className="loader"></span>
                 ) : (
-                  <p>Generate DDx</p>
+                  <p>DDx</p>
                 )}
               </div>
             </a>
           </div>
-          {apiOutput && (
+          {ddxList && (
             <div className="output">
               <div className="output-header-container">
                 <div className="output-header">
@@ -82,13 +126,57 @@ const Home = () => {
                 </div>
               </div>
               <div className="output-content">
-                <p>{apiOutput}</p>
+                {ddxList.map((output, index) => (
+                  <>
+                    <div
+                      style={{
+                        display: 'flex',
+                        justifyContent: 'space-between',
+                        width: '15rem',
+                      }}
+                    >
+                      <p>{output}</p>
+
+                      {whyIndex.includes(index) ? (
+                        <a
+                          href="#"
+                          onClick={() => {
+                            setWhyIndex(
+                              whyIndex.filter((item) => item !== index)
+                            );
+                            // callGenerateWhyEndpoint({ dx: output, index });
+                          }}
+                        >
+                          <p style={{ color: 'white' }}>close</p>
+                        </a>
+                      ) : (
+                        <a
+                          href="#"
+                          onClick={() => {
+                            setWhyIndex((whyIndex) => [...whyIndex, index]);
+                            if (apiWhyOutput[index] === null) {
+                              callGenerateWhyEndpoint({ dx: output, index });
+                            }
+                          }}
+                        >
+                          <p style={{ color: 'white' }}>why?</p>
+                        </a>
+                      )}
+                    </div>
+                    {whyIndex.includes(index) &&
+                      apiWhyOutput[index] === null &&
+                      isGeneratingWhy && <span className="loader"></span>}
+                    {whyIndex.includes(index) && apiWhyOutput && (
+                      <p>{apiWhyOutput[index]}</p>
+                    )}
+                  </>
+                ))}
               </div>
             </div>
           )}
         </div>
       </div>
-      <div className="badge-container grow">
+      {/* <div className="badge-container grow">
         <a
           href="https://buildspace.so/builds/ai-writer"
           target="_blank"
@@ -99,7 +187,7 @@ const Home = () => {
             <p>build with buildspace</p>
           </div>
         </a>
-      </div>
+      </div> */}
     </div>
   );
 };
