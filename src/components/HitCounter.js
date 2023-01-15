@@ -5,7 +5,7 @@ export function HitCounter({ slug }) {
   const [hits, setHits] = useState(undefined);
 
   useEffect(() => {
-    if (process.env.NODE !== 'production') {
+    if (process.env.NODE_ENV !== 'production') {
       return;
     }
 
