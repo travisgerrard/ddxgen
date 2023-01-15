@@ -190,6 +190,17 @@ const Home = () => {
         </a>
       </div> */}
       <HitCounter slug="homePage" />
+      <div className="container">
+        <div className="header-subtitle">
+          <p style={{ fontSize: '12px', color: 'grey', textAlign: 'center' }}>
+            This site provides useful information but is not a substitute for
+            professional medical advice, diagnosis, or treatment. If you think
+            you may have a medical emergency, immediately call your doctor or
+            dial 911. Before acting on any of the information here, consult with
+            your doctor or nurse to make sure that it is right for you.
+          </p>
+        </div>
+      </div>
     </div>
   );
 };
