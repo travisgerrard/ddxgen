@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import RetroHitCounter from 'react-retro-hit-counter';
 
-function HitCounter({ slug }) {
+export function HitCounter({ slug }) {
   const [hits, setHits] = useState(undefined);
 
   useEffect(() => {
@@ -24,5 +24,3 @@ function HitCounter({ slug }) {
 
   return <RetroHitCounter hits={hits} />;
 }
-
-export default HitCounter;

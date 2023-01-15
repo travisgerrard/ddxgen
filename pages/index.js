@@ -2,7 +2,7 @@ import { useState } from 'react';
 import Head from 'next/head';
 // import Image from 'next/image';
 // import buildspaceLogo from '../assets/buildspace-logo.png';
-import Counter from '../src/components/HitCounter';
+import { HitCounter } from '../src/components/HitCounter';
 
 const Home = () => {
   const [userInput, setUserInput] = useState('');
@@ -189,7 +189,7 @@ const Home = () => {
           </div>
         </a>
       </div> */}
-      <Counter />
+      <HitCounter slug="homePage" />
     </div>
   );
 };
