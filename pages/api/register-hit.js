@@ -6,11 +6,11 @@ module.exports = async (req, res) => {
     secret: process.env.FAUNA_SECRET_KEY,
   });
 
-  const { slug } = req.qeury;
+  const { slug } = req.query;
 
   if (!slug) {
     return res.status(400).json({
-      message: 'Article slugh not provided',
+      message: 'Article slug not provided',
     });
   }
 
@@ -20,13 +20,11 @@ module.exports = async (req, res) => {
   );
 
   if (!doesDocExist) {
-    (await client) /
-      query(
-        q /
-          Create(q.Collection('hits'), {
-            data: { slug: slug, hits: 0 },
-          })
-      );
+    await client.query(
+      q.Create(q.Collection('hits'), {
+        data: { slug: slug, hits: 0 },
+      })
+    );
   }
 
   // Fetch the document for real
