@@ -12,22 +12,11 @@ const Home = () => {
   const [ddxList, setDdxList] = useState('');
   const [isGeneratingDDx, setIsGeneratingDDx] = useState(false);
 
-  // For the Why Generation
-  const [apiWhyOutput, setApiWhyOutput] = useState([
-    null,
-    null,
-    null,
-    null,
-    null,
-  ]);
-  const [whyIndex, setWhyIndex] = useState([]);
-  const [isGeneratingWhy, setIsGeneratingWhy] = useState(false);
-
   const callGenerateDDxEndpoint = async ({}) => {
     setIsGeneratingDDx(true);
 
     console.log('Calling OpenAI...');
-    const response = await fetch('/api/generateDDx', {
+    const response = await fetch('/api/generateNote', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -37,12 +26,11 @@ const Home = () => {
 
     const data = await response.json();
     const { output } = data;
-    console.log('Output', output);
 
-    let outPutBrokenUp = output.split(/\r?\n/);
-    console.log('Broken up', outPutBrokenUp);
+    // let outPutBrokenUp = output.split(/\r?\n/);
+    // console.log('Broken up', outPutBrokenUp);
 
-    setDdxList(outPutBrokenUp);
+    // setDdxList(outPutBrokenUp);
     setApiOutput(output);
     setIsGeneratingDDx(false);
   };
@@ -81,21 +69,21 @@ const Home = () => {
   return (
     <div className="root">
       <Head>
-        <title>DDxGen</title>
+        <title>Create Note</title>
       </Head>
       <div className="container">
         <div className="header">
           <div className="header-title">
-            <h1>DDxGen</h1>
+            <h1>Create Note</h1>
           </div>
           <div className="header-subtitle">
-            <h2>Generate differential diagnoses</h2>
-            <Link href="noteCreate">Create a message</Link>
+            <h2>Create a note to a patient from the informaiton below</h2>
+            <Link href="/">Create a DDx</Link>
             <br />
             <Link href="billingCodes">Generate Billing Codes</Link>
           </div>
           <div className="header-subtitle">
-            <h3>Enter HPI below to get started</h3>
+            <h3>Enter base of the note</h3>
           </div>
         </div>
         <div className="prompt-container">
@@ -116,65 +104,20 @@ const Home = () => {
                 {isGeneratingDDx ? (
                   <span className="loader"></span>
                 ) : (
-                  <p>DDx</p>
+                  <p>Note</p>
                 )}
               </div>
             </a>
           </div>
-          {ddxList && (
+          {apiOutput && (
             <div className="output">
               <div className="output-header-container">
                 <div className="output-header">
-                  <h3>Differential diagnosis</h3>
+                  <h3>Note</h3>
                 </div>
               </div>
               <div className="output-content">
-                {ddxList.map((output, index) => (
-                  <Fragment key={index}>
-                    <div
-                      style={{
-                        display: 'flex',
-                        justifyContent: 'space-between',
-                        width: '15rem',
-                      }}
-                    >
-                      <p>{output}</p>
-
-                      {/* {whyIndex.includes(index) ? (
-                        <a
-                          href="#"
-                          onClick={() => {
-                            setWhyIndex(
-                              whyIndex.filter((item) => item !== index)
-                            );
-                            // callGenerateWhyEndpoint({ dx: output, index });
-                          }}
-                        >
-                          <p style={{ color: 'white' }}>close</p>
-                        </a>
-                      ) : (
-                        <a
-                          href="#"
-                          onClick={() => {
-                            setWhyIndex((whyIndex) => [...whyIndex, index]);
-                            if (apiWhyOutput[index] === null) {
-                              callGenerateWhyEndpoint({ dx: output, index });
-                            }
-                          }}
-                        >
-                          <p style={{ color: 'white' }}>why?</p>
-                        </a>
-                      )} */}
-                    </div>
-                    {/* {whyIndex.includes(index) &&
-                      apiWhyOutput[index] === null &&
-                      isGeneratingWhy && <span className="loader"></span>}
-                    {whyIndex.includes(index) && apiWhyOutput && (
-                      <p>{apiWhyOutput[index]}</p>
-                    )} */}
-                    <br />
-                  </Fragment>
-                ))}
+                <p>{apiOutput}</p>
               </div>
             </div>
           )}
